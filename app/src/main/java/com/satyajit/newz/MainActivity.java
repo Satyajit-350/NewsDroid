@@ -7,6 +7,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -21,6 +22,9 @@ import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 import com.r0adkll.slidr.Slidr;
+import com.satyajit.newz.database.BookMarks;
+import com.satyajit.newz.database.BookmarkActivity;
+import com.satyajit.newz.database.BookmarkViewModel;
 
 import java.util.ArrayList;
 
@@ -30,7 +34,12 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NewsAdapter.BookmarkClickListener {
+
+
+    public static final String EXTRA_ID = "com.satyajit.newz.EXTRA_ID";
+    public static final String EXTRA_TITLE = "com.satyajit.newz.EXTRA_TITLE";
+    public static final String EXTRA_DESCRIPTION = "com.satyajit.newz.EXTRA_DESCRIPTION";
 
     //api key - 703e31b49812416aa806572236d54e4b
     //api(for all) -  https://newsapi.org/v2/top-headlines?country=in&excludeDomains=stackoverflow.com&sortBy=publishedAt&language=en&apikey=703e31b49812416aa806572236d54e4b
@@ -52,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
 
     private NewsAdapter newsAdapter;
     private ArrayList<articles> newsArrayList;
+
+    private BookmarkViewModel bookmarkViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent);
                         break;
                     case R.id.bookmark_id:
-                        Toast.makeText(MainActivity.this,"Bookmarks",Toast.LENGTH_SHORT).show();
+                        Intent bIntent = new Intent(MainActivity.this, BookmarkActivity.class);
+                        startActivity(bIntent);
                         break;
                     case R.id.logout_id:
                         Toast.makeText(MainActivity.this, "logout", Toast.LENGTH_SHORT).show();
@@ -95,8 +107,10 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+
         //-------------------------------------------------------------------------------------------------
 
+        bookmarkViewModel = new ViewModelProvider(this).get(BookmarkViewModel.class);
 
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
 
@@ -106,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
         searchView = findViewById(R.id.search_news);
 
         newsArrayList = new ArrayList<>();
-        newsAdapter = new NewsAdapter(newsArrayList,this);
+        newsAdapter = new NewsAdapter(newsArrayList,this, this::onclickBookmark);
 
 
         newsRecyclerView.setAdapter(newsAdapter);
@@ -145,6 +159,17 @@ public class MainActivity extends AppCompatActivity {
         //----------------------------------------------------------------------------------------------------------
 
 
+    }
+
+    //close navigation drawer when back is pressed
+    @Override
+    public void onBackPressed() {
+
+        if(this.drawerLayout.isDrawerOpen(GravityCompat.START)){
+            this.drawerLayout.closeDrawer(GravityCompat.START);
+        }else{
+            super.onBackPressed();
+        }
     }
 
     //getting data for our news through retrofit
@@ -231,4 +256,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onclickBookmark(int pos) {
+
+        String bookmarkTitle = newsArrayList.get(pos).getTitle();
+        String bookmarkDesc = newsArrayList.get(pos).getDescription();
+
+        BookMarks bookmarks = new BookMarks(bookmarkTitle,bookmarkDesc);
+        bookmarkViewModel.insert(bookmarks);
+        Toast.makeText(this, "Bookmark Saved", Toast.LENGTH_SHORT).show();
+
+    }
 }

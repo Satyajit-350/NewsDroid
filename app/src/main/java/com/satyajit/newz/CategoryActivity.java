@@ -1,6 +1,8 @@
 package com.satyajit.newz;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -11,6 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.r0adkll.slidr.Slidr;
+import com.satyajit.newz.database.BookMarks;
+import com.satyajit.newz.database.BookmarkViewModel;
 
 import java.util.ArrayList;
 
@@ -20,7 +24,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class CategoryActivity extends AppCompatActivity implements CategoryAdapter.CategoryClickListener{
+public class CategoryActivity extends AppCompatActivity implements CategoryAdapter.CategoryClickListener, NewsAdapter.BookmarkClickListener {
 
     private RecyclerView recyclerView1, recyclerView2;
     private ProgressBar progressBar;
@@ -29,6 +33,8 @@ public class CategoryActivity extends AppCompatActivity implements CategoryAdapt
     private ArrayList<articles> newsArrayList1;
     private ArrayList<CategoryModel> categoryArrayList1;
     private TextView categorySelectTextView;
+
+    private BookmarkViewModel bookmarkViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +51,11 @@ public class CategoryActivity extends AppCompatActivity implements CategoryAdapt
         progressBar = findViewById(R.id.loading_indicator1);
         categorySelectTextView = findViewById(R.id.category_text_view);
 
+        bookmarkViewModel = new ViewModelProvider(this).get(BookmarkViewModel.class);
+
         categoryArrayList1 = new ArrayList<>();
         newsArrayList1 = new ArrayList<>();
-        newsAdapter1 = new NewsAdapter(newsArrayList1, this);
+        newsAdapter1 = new NewsAdapter(newsArrayList1, this, this::onclickBookmark);
         categoryAdapter1 = new CategoryAdapter(this, categoryArrayList1, this::onclickCategory);
 
         recyclerView1.setLayoutManager(new GridLayoutManager(this,2));
@@ -131,5 +139,17 @@ public class CategoryActivity extends AppCompatActivity implements CategoryAdapt
         recyclerView2.setVisibility(View.VISIBLE);
         String category = categoryArrayList1.get(pos).getCategories();
         getNews(category);
+    }
+
+    @Override
+    public void onclickBookmark(int pos) {
+
+        String bookmarkTitle = newsArrayList1.get(pos).getTitle();
+        String bookmarkDesc = newsArrayList1.get(pos).getDescription();
+
+        BookMarks bookmarks = new BookMarks(bookmarkTitle,bookmarkDesc);
+        bookmarkViewModel.insert(bookmarks);
+        Toast.makeText(this, "Bookmark Saved", Toast.LENGTH_SHORT).show();
+
     }
 }

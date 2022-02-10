@@ -3,6 +3,7 @@ package com.satyajit.newz.database;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,6 +16,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.r0adkll.slidr.Slidr;
+import com.satyajit.newz.MainActivity;
 import com.satyajit.newz.NewsAdapter;
 import com.satyajit.newz.R;
 
@@ -26,6 +29,8 @@ public class BookmarkActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
 
+    private Toolbar bookmarkToolbar;
+
     BookmarkAdapter bookmarkAdapter;
 
     public static final int ADD_NEWS_REQUEST = 1;
@@ -34,6 +39,14 @@ public class BookmarkActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bookmark);
+
+        int primary = getResources().getColor(R.color.black);
+        int secondary = getResources().getColor(R.color.black);
+        Slidr.attach(this,primary,secondary);
+
+        bookmarkToolbar = (Toolbar) findViewById(R.id.bookmark_toolbar);
+
+        setSupportActionBar(bookmarkToolbar);
 
         recyclerView = findViewById(R.id.database_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -55,8 +68,8 @@ public class BookmarkActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == ADD_NEWS_REQUEST && resultCode == RESULT_OK){
-            String title = data.getStringExtra(NewsAdapter.EXTRA_ID);
-            String description = data.getStringExtra(NewsAdapter.EXTRA_DESCRIPTION);
+            String title = data.getStringExtra(MainActivity.EXTRA_ID);
+            String description = data.getStringExtra(MainActivity.EXTRA_DESCRIPTION);
 
             BookMarks bookmarks = new BookMarks(title,description);
             bookmarkViewModel.insert(bookmarks);

@@ -1,5 +1,6 @@
 package com.satyajit.newz;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -23,17 +24,16 @@ import java.util.ArrayList;
 
 public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder> {
 
-    public static final String EXTRA_ID = "com.satyajit.newz.EXTRA_ID";
-    public static final String EXTRA_TITLE = "com.satyajit.newz.EXTRA_TITLE";
-    public static final String EXTRA_DESCRIPTION = "com.satyajit.newz.EXTRA_DESCRIPTION";
-
     private ArrayList<articles> articlesArrayList;
 
     private Context context;
 
-    public NewsAdapter(ArrayList<articles> articlesArrayList, Context context) {
+    private BookmarkClickListener bookmarkClickListener;
+
+    public NewsAdapter(ArrayList<articles> articlesArrayList, Context context, BookmarkClickListener bookmarkClickListener) {
         this.articlesArrayList = articlesArrayList;
         this.context = context;
+        this.bookmarkClickListener = bookmarkClickListener;
     }
 
     @NonNull
@@ -44,7 +44,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
     }
 
     @Override
-    public void onBindViewHolder(@NonNull NewsViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull NewsViewHolder holder, @SuppressLint("RecyclerView") int position) {
         articles articles = articlesArrayList.get(position);
         holder.heading.setText(articles.getTitle());
         holder.subTitle.setText(articles.getDescription());
@@ -84,11 +84,8 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
         holder.bookmarkImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                holder.bookmarkImage.setImageResource(R.drawable.ic_bookmark_red);
-//                Intent bookmarkData = new Intent();
-//                bookmarkData.putExtra(EXTRA_TITLE,articles.getTitle());
-//                bookmarkData.putExtra(EXTRA_DESCRIPTION,articles.getDescription());
-                Toast.makeText(view.getContext(), "bookmarked", Toast.LENGTH_SHORT).show();
+                holder.bookmarkImage.setImageResource(R.drawable.ic_bookmark_dark);
+                bookmarkClickListener.onclickBookmark(position);
             }
         });
     }
@@ -117,5 +114,9 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
             bookmarkImage = itemView.findViewById(R.id.bookmark_image_view);
             shareImage = itemView.findViewById(R.id.share_image_view);
         }
+    }
+
+    public interface BookmarkClickListener{
+        void onclickBookmark(int pos);
     }
 }
