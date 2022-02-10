@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.satyajit.newz">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_designer_news_1"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/ic_designer_news_1"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Newz">
+        <activity
+            android:name=".database.BookmarkActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CategoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".NewsDetailActivity"
+            android:exported="false"
+            android:label="NEWSDROID"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="NEWSDROID" />
+    </application>
+
+</manifest>
