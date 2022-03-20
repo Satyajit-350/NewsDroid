@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements NewsAdapter.Bookm
         loadingIndicator.setVisibility(View.VISIBLE);
         newsArrayList.clear();
 
-        String url = "https://newsapi.org/v2/everything?q=Apple&from=2022-01-29&sortBy=popularity&apiKey=703e31b49812416aa806572236d54e4b";
+        String url = "https://newsapi.org/v2/everything?q=india&apiKey=703e31b49812416aa806572236d54e4b";
         String BASE_URL = "https://newsapi.org/";
 
         Retrofit retrofit = new Retrofit.Builder()
