@@ -13,4 +13,5 @@
     <color name="green">#44D34A</color>
     <color name="light_grey">#9E9E9E</color>
     <color name="transparent">#0000ffff</color>
+    <color name="shimmer_color">#B5B5B5</color>
 </resources>

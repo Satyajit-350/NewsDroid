@@ -12,6 +12,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.r0adkll.slidr.Slidr;
 import com.satyajit.newz.database.BookMarks;
 import com.satyajit.newz.database.BookmarkViewModel;
@@ -27,7 +28,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class CategoryActivity extends AppCompatActivity implements CategoryAdapter.CategoryClickListener, NewsAdapter.BookmarkClickListener {
 
     private RecyclerView recyclerView1, recyclerView2;
-    private ProgressBar progressBar;
+    private ShimmerFrameLayout shimmerFrameLayout;
     private NewsAdapter newsAdapter1;
     private CategoryAdapter categoryAdapter1;
     private ArrayList<articles> newsArrayList1;
@@ -48,7 +49,9 @@ public class CategoryActivity extends AppCompatActivity implements CategoryAdapt
 
         recyclerView1 = findViewById(R.id.categories_recycler_view1);
         recyclerView2 = findViewById(R.id.news_recycler_view1);
-        progressBar = findViewById(R.id.loading_indicator1);
+        shimmerFrameLayout = findViewById(R.id.shimmer1);
+        shimmerFrameLayout.stopShimmer();
+        shimmerFrameLayout.setVisibility(View.GONE);
         categorySelectTextView = findViewById(R.id.category_text_view);
 
         bookmarkViewModel = new ViewModelProvider(this).get(BookmarkViewModel.class);
@@ -68,8 +71,11 @@ public class CategoryActivity extends AppCompatActivity implements CategoryAdapt
         categorySelectTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                shimmerFrameLayout.stopShimmer();
+                shimmerFrameLayout.setVisibility(View.GONE);
                 recyclerView2.setVisibility(View.GONE);
                 recyclerView1.setVisibility(View.VISIBLE);
+
             }
         });
 
@@ -88,11 +94,12 @@ public class CategoryActivity extends AppCompatActivity implements CategoryAdapt
 
     //getting data for our news through retrofit
     private void getNews(String categories) {
-        progressBar.setVisibility(View.VISIBLE);
+        shimmerFrameLayout.startShimmer();
+        shimmerFrameLayout.setVisibility(View.VISIBLE);
         newsArrayList1.clear();
 
         String category = "https://newsapi.org/v2/top-headlines?country=in&category=" + categories + "&apiKey=703e31b49812416aa806572236d54e4b";
-        String url = "https://newsapi.org/v2/everything?q=Apple&from=2022-01-29&sortBy=popularity&apiKey=703e31b49812416aa806572236d54e4b";
+        String url = "https://newsapi.org/v2/everything?q=india&apiKey=703e31b49812416aa806572236d54e4b";
         String BASE_URL = "https://newsapi.org/";
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -113,7 +120,7 @@ public class CategoryActivity extends AppCompatActivity implements CategoryAdapt
             @Override
             public void onResponse(Call<NewsModel> call, Response<NewsModel> response) {
                 NewsModel newsModel = response.body();
-                progressBar.setVisibility(View.GONE);
+                shimmerFrameLayout.setVisibility(View.GONE);
 
                 ArrayList<articles> articles = newsModel.getArticles();
                 for (int i = 0; i < articles.size(); i++) {

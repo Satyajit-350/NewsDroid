@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.material.navigation.NavigationView;
 import com.r0adkll.slidr.Slidr;
 import com.satyajit.newz.database.BookMarks;
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements NewsAdapter.Bookm
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView newsRecyclerView;
-    private ProgressBar loadingIndicator;
+    private ShimmerFrameLayout shimmerFrameLayout;
     private ImageView imageView;
     private SearchView searchView;
 
@@ -115,7 +116,11 @@ public class MainActivity extends AppCompatActivity implements NewsAdapter.Bookm
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
 
         newsRecyclerView = findViewById(R.id.news_recycler_view);
-        loadingIndicator = findViewById(R.id.loading_indicator);
+
+        shimmerFrameLayout = findViewById(R.id.shimmer);
+        //start the shimmer effect
+        shimmerFrameLayout.startShimmer();
+
         imageView = findViewById(R.id.empty_image);
         searchView = findViewById(R.id.search_news);
 
@@ -124,7 +129,6 @@ public class MainActivity extends AppCompatActivity implements NewsAdapter.Bookm
 
 
         newsRecyclerView.setAdapter(newsAdapter);
-
 
         getNews();
         newsAdapter.notifyDataSetChanged();
@@ -174,7 +178,9 @@ public class MainActivity extends AppCompatActivity implements NewsAdapter.Bookm
 
     //getting data for our news through retrofit
     private void getNews(){
-        loadingIndicator.setVisibility(View.VISIBLE);
+        shimmerFrameLayout.startShimmer();
+        shimmerFrameLayout.setVisibility(View.VISIBLE);
+        newsRecyclerView.setVisibility(View.VISIBLE);
         newsArrayList.clear();
 
         String url = "https://newsapi.org/v2/everything?q=india&apiKey=703e31b49812416aa806572236d54e4b";
@@ -194,7 +200,8 @@ public class MainActivity extends AppCompatActivity implements NewsAdapter.Bookm
             @Override
             public void onResponse(Call<NewsModel> call, Response<NewsModel> response) {
                 NewsModel newsModel = response.body();
-                loadingIndicator.setVisibility(View.GONE);
+                shimmerFrameLayout.stopShimmer();
+                shimmerFrameLayout.setVisibility(View.GONE);
 
                 ArrayList<articles>articles = newsModel.getArticles();
                 for(int i = 0;i<articles.size();i++){
@@ -208,6 +215,9 @@ public class MainActivity extends AppCompatActivity implements NewsAdapter.Bookm
 
             @Override
             public void onFailure(Call<NewsModel> call, Throwable t) {
+                shimmerFrameLayout.stopShimmer();
+                shimmerFrameLayout.setVisibility(View.GONE);
+                newsRecyclerView.setVisibility(View.GONE);
                 imageView.setVisibility(View.VISIBLE);
                 Toast.makeText(MainActivity.this, "An error has occurred", Toast.LENGTH_SHORT).show();
             }
@@ -217,7 +227,8 @@ public class MainActivity extends AppCompatActivity implements NewsAdapter.Bookm
     //getting data when search is done
     private void getNewsBySearch(String news){
         imageView.setVisibility(View.GONE);
-        loadingIndicator.setVisibility(View.VISIBLE);
+        shimmerFrameLayout.startShimmer();
+        shimmerFrameLayout.setVisibility(View.VISIBLE);
         newsArrayList.clear();
 
         String url = "https://newsapi.org/v2/everything?q="+news+"&apiKey=703e31b49812416aa806572236d54e4b";
@@ -236,7 +247,8 @@ public class MainActivity extends AppCompatActivity implements NewsAdapter.Bookm
             @Override
             public void onResponse(Call<NewsModel> call, Response<NewsModel> response) {
                 NewsModel newsModel = response.body();
-                loadingIndicator.setVisibility(View.GONE);
+                shimmerFrameLayout.stopShimmer();
+                shimmerFrameLayout.setVisibility(View.GONE);
 
                 ArrayList<articles>articles = newsModel.getArticles();
                 for(int i = 0;i<articles.size();i++){
@@ -250,7 +262,8 @@ public class MainActivity extends AppCompatActivity implements NewsAdapter.Bookm
 
             @Override
             public void onFailure(Call<NewsModel> call, Throwable t) {
-                loadingIndicator.setVisibility(View.GONE);
+                shimmerFrameLayout.stopShimmer();
+                shimmerFrameLayout.setVisibility(View.GONE);
                 Toast.makeText(MainActivity.this, "An error has occurred", Toast.LENGTH_SHORT).show();
             }
         });
